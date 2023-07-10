@@ -9,7 +9,10 @@
     outputs = { self, flake-parts, ...}@inputs:  flake-parts.lib.mkFlake { inherit inputs; } {
       debug = true;
       systems = [ "x86_64-linux" "aarch64-linux" ];
-      imports = [ ./impl/packages.nix ./impl/targets.nix ];
+      imports = [ 
+        ./impl/targets.nix
+        ./impl/packages.nix
+      ];
       flake = { lib, ...}: {
         global.nixos = [
               ({ pkgs, ...}: {
@@ -24,13 +27,13 @@
             };
         };
         variants = {
-            debug = { ghaf.debug = true; };
-            netvm = { ghaf.debug = true; ghaf.netvm = true; };
-            release = { ghaf.debug = false; ghaf.release = true; };
+            debug.nixosConfiguration = [{ ghaf.debug = true; }];
+            netvm.nixosConfiguration = [{ ghaf.debug = true; ghaf.netvm = true; }];
+            release.nixosConfiguration = [{ ghaf.debug = false; ghaf.release = true; }];
         };
         boards.fakeOrinBoard = {
             system = "aarch64-linux";
-            nixos = [{
+            nixosConfiguration = [{
                 boot.isContainer = true; # Don't build kernel and other slow things (because it is prototyping)
             }];
             flashScript = { image, pkgs, system, ...}: pkgs.runLocal "flashscript" { }
