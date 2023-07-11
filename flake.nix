@@ -14,28 +14,32 @@
         ./impl/packages.nix
       ];
       flake = { lib, ...}: {
-        global.nixos = [
-              ({ pkgs, ...}: {
-                environment.systemPackages = with pkgs; [
-                  # List problematic packages here
-                  gnome.zenity
-                ];
-              })
+        global.nixosConfiguration = [
+            {
+                boot.isContainer = true; # Don't build kernel and other slow things (because it is prototyping)
+                system.stateVersion = "23.05"; # Suppress warning
+            }
            ];
         virtualMachines = {
             netvm = {
             };
         };
         variants = {
-            debug.nixosConfiguration = [{ ghaf.debug = true; }];
-            netvm.nixosConfiguration = [{ ghaf.debug = true; ghaf.netvm = true; }];
-            release.nixosConfiguration = [{ ghaf.debug = false; ghaf.release = true; }];
+            debug.nixosConfiguration = [ /* { ghaf.debug = true; } */];
+            netvm.nixosConfiguration = [/* { ghaf.debug = true; ghaf.netvm = true; } */];
+            release.nixosConfiguration = [ /* { ghaf.debug = false; ghaf.release = true; } */];
         };
         boards.fakeOrinBoard = {
             system = "aarch64-linux";
-            nixosConfiguration = [{
-                boot.isContainer = true; # Don't build kernel and other slow things (because it is prototyping)
-            }];
+            nixosConfiguration = [
+              ({ pkgs, ...}: {
+                environment.systemPackages = with pkgs; [
+                  # List problematic packages here
+                  #gnome.zenity
+                  zathura
+                ];
+              })
+            ];
             flashScript = { image, pkgs, system, ...}: pkgs.runLocal "flashscript" { }
               ''
               '';

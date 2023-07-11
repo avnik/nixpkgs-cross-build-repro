@@ -27,7 +27,7 @@ let
     buildSystem
   }: lib.nixosSystem {
     specialArgs = { inherit inputs; };
-    modules = nixosConfiguration ++ mkHostStatement hostSystem ++ mkCrossStatement hostSystem buildSystem;
+    modules = self.global.nixosConfiguration ++ nixosConfiguration ++ mkHostStatement hostSystem ++ mkCrossStatement hostSystem buildSystem;
   };
   mkSystem = {
     nixosConfiguration,
