@@ -5,6 +5,10 @@
           url = "github:hercules-ci/flake-parts";
           inputs.nixpkgs-lib.follows = "nixpkgs";
         };
+        nix-ocaml = {
+          url = "github:nix-ocaml/nix-overlays";  
+          inputs.nixpkgs.follows = "nixpkgs";
+        };
     };
     outputs = { self, flake-parts, ...}@inputs:  flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" "aarch64-linux" ];
@@ -16,11 +20,17 @@
               {
                 nixpkgs.hostPlatform.system = "aarch64-linux";
                 nixpkgs.buildPlatform.system = "x86_64-linux";
+                nixpkgs.overlays =  [ 
+                  inputs.nix-ocaml.overlays.default
+                  (final: prev: {
+                     caml-crush = final.callPackage ./caml-crush.nix { };
+                  })
+                ];
               }
               ({ pkgs, ...}: {
                 environment.systemPackages = with pkgs; [
                   # List problematic packages here
-                  gnome.zenity
+                  caml-crush 
                 ];
                 boot.isContainer = true; # Don't build kernel and other slow things
               })
