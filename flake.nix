@@ -10,7 +10,7 @@
           inputs.nixpkgs.follows = "nixpkgs";
         };
     };
-    outputs = { self, flake-parts, ...}@inputs:  flake-parts.lib.mkFlake { inherit inputs; } {
+    outputs = { self, flake-parts, nix-ocaml, ...}@inputs:  flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" "aarch64-linux" ];
       flake = { lib, ...}: {
         nixosConfigurations = {
@@ -20,9 +20,10 @@
               {
                 nixpkgs.hostPlatform.system = "aarch64-linux";
                 nixpkgs.buildPlatform.system = "x86_64-linux";
-                nixpkgs.overlays =  [ 
-                  inputs.nix-ocaml.overlays.default
-                  (final: prev: {
+                nixpkgs.overlays =  [
+                  (import ./ocaml.nix { inherit (inputs) nix-ocaml nixpkgs; } )
+                  (final: prev:
+                   {
                      caml-crush = final.callPackage ./caml-crush.nix { };
                   })
                 ];
