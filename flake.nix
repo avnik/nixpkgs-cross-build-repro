@@ -22,10 +22,6 @@
                 nixpkgs.buildPlatform.system = "x86_64-linux";
                 nixpkgs.overlays =  [
                   (import ./ocaml.nix { inherit (inputs) nix-ocaml nixpkgs; } )
-                  (final: prev:
-                   {
-                     caml-crush = final.callPackage ./caml-crush.nix { };
-                  })
                 ];
               }
               ({ pkgs, ...}: {
